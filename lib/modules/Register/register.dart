@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:project_android_othman_akram/modules/Register/register.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:project_android_othman_akram/modules/loginModule/login.dart';
 import 'package:project_android_othman_akram/shared/appCubit/cubit.dart';
 import 'package:project_android_othman_akram/shared/appStatus/states.dart';
 import 'package:project_android_othman_akram/shared/components/components.dart';
-//import 'package:second_project/shared/components/components.dart';
 
-class Login extends StatelessWidget {
+class Register extends StatelessWidget {
+  Register({Key? key}) : super(key: key);
+
   var AddressController = TextEditingController();
 
   var passwordController = TextEditingController();
+  var nameController = TextEditingController();
 
   var formKey = GlobalKey<FormState>();
 
   IconData icons = Icons.remove_red_eye;
-
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AppCubit, AppState>(
@@ -31,13 +33,37 @@ class Login extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      'LOGIN',
+                      'Register',
                       style: TextStyle(
                         color: Colors.blueAccent,
                         fontSize: 30.0,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,
+                    ),
+                    SizedBox(
+                      height: 20.0,
+                    ),
+                    TextFormField(
+                      controller: nameController,
+                      decoration: InputDecoration(
+                        labelText: 'Name',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.person),
+                      ),
+                      onFieldSubmitted: (value) {
+                        print(value);
+                      },
+                      onChanged: (value) {
+                        print(value);
+                      },
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return "name can t be null ";
+                        } else {
+                          return null;
+                        }
+                      },
                     ),
                     SizedBox(
                       height: 20.0,
@@ -102,12 +128,27 @@ class Login extends StatelessWidget {
                       height: 20.0,
                     ),
                     defaultButton(
-                        text: "LOGIN",
+                        text: 'Register',
                         onPressed: () {
                           if (formKey.currentState!.validate()) {
-                            cubit.login(
-                                email: AddressController.text,
-                                password: passwordController.text);
+                            cubit
+                                .register(
+                              email: AddressController.text,
+                              password: passwordController.text,
+                              name: nameController.text,
+                            )
+                                .then((value) {
+                              print(value);
+                            }).catchError((error) {
+                              Fluttertoast.showToast(
+                                  msg: "Something was wrong try again",
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.SNACKBAR,
+                                  timeInSecForIosWeb: 1,
+                                  backgroundColor: Colors.red[800],
+                                  textColor: Colors.white,
+                                  fontSize: 16.0);
+                            });
                             // cubit.tryToken();
                           }
                         }),
@@ -117,12 +158,17 @@ class Login extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('Don\'t have an account ?'),
+                        Text('Login'),
                         TextButton(
                             onPressed: () {
-                              cubit.changeIndexToRegister();
+                              /*  Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Login()));
+                            }, */
+                              cubit.changeIndexToLogin();
                             },
-                            child: Text('Register'))
+                            child: Text('Login'))
                       ],
                     ),
                   ],
